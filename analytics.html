@@ -1,0 +1,28 @@
+<!-- ================= ANALYTICS ================= -->
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+  
+  // Track game plays
+  function trackGamePlay(gameName) {
+    gtag('event', 'game_play', {
+      'game_name': gameName,
+      'timestamp': new Date().toISOString()
+    });
+  }
+  
+  // Track game over / scores
+  function trackGameEnd(gameName, score, level) {
+    gtag('event', 'game_end', {
+      'game_name': gameName,
+      'score': score,
+      'level': level,
+      'timestamp': new Date().toISOString()
+    });
+  }
+</script>
