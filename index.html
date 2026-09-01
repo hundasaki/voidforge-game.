@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>VoidForge Arcade</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:#070910;
+    color:white;
+    touch-action:none;
+}
+
+button{
+    border:0;
+    border-radius:14px;
+    padding:14px 22px;
+    font-size:18px;
+    font-weight:bold;
+    color:white;
+    background:#ffffff18;
+}
+
+button:active{
+    transform:scale(.94);
+}
+
+.hidden{display:none!important}
+
+.screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
+}
+
+#home{
+    background:
+        radial-gradient(circle at 50% 20%,#25366d 0,#10162d 35%,#070910 75%);
+}
+
+.logo{
+    font-size:14px;
+    letter-spacing:5px;
+    color:#6ee7ff;
+    margin-bottom:10px;
+}
+
+#home h1{
+    font-size:clamp(38px,10vw,70px);
+    margin:0;
+}
+
+.subtitle{
+    color:#a8afc0;
+    margin:10px 0 25px;
+}
+
+.games{
+    width:min(94%,700px);
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.card{
+    background:#111522;
+    border:1px solid #293044;
+    border-radius:20px;
+    padding:20px;
+    text-align:left;
+    box-shadow:0 10px 30px #0008;
+}
+
+.card .emoji{
+    font-size:45px;
+}
+
+.card h2{
+    margin:8px 0;
+}
+
+.card p{
+    color:#9299aa;
+    min-height:42px;
+    font-size:14px;
+}
+
+.play{
+    width:100%;
+    background:#3478ff;
+}
+
+#coinGame{
+    background:
+        linear-gradient(#07152b,#0b3151);
+}
+
+#dungeonGame{
+    background:
+        radial-gradient(circle,#253047,#090d15 70%);
+}
+
+.game{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+}
+
+.hud{
+    position:absolute;
+    top:12px;
+    left:12px;
+    right:12px;
+    z-index:100;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:17px;
+    font-weight:bold;
+    background:#0007;
+    padding:10px 13px;
+    border-radius:14px;
+    backdrop-filter:blur(5px);
+}
+
+.player{
+    position:absolute;
+    width:44px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    z-index:20;
+}
+
+.controls{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:15px;
+    z-index:150;
+    display:flex;
+    justify-content:center;
+    gap:12px;
+}
+
+.ctrl{
+    width:65px;
+    height:58px;
+    padding:0;
+    font-size:27px;
+    background:#ffffff25;
+    border:1px solid #ffffff25;
+}
+
+.falling{
+    position:absolute;
+    z-index:10;
+    font-size:31px;
+}
+
+#message{
+    z-index:500;
+    background:#000b;
+    backdrop-filter:blur(8px);
+}
+
+#message h1{
+    font-size:45px;
+    margin:5px;
+}
+
+#message p{
+    color:#b9c0d0;
+    margin:8px 0 22px;
+}
+
+#backButton{
+    position:absolute;
+    top:65px;
+    left:12px;
+    z-index:200;
+    padding:9px 13px;
+    font-size:13px;
+}
+
+.wall{
+    position:absolute;
+    background:#20283a;
+    border:2px solid #343e56;
+}
+
+.enemy{
+    position:absolute;
+    width:40px;
+    height:40px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:29px;
+    z-index:30;
+}
+
+.dungeonItem{
+    position:absolute;
+    z-index:25;
+    font-size:34px;
+}
+
+#dPlayer{
+    background:#27d7ff;
+    border-radius:10px;
+}
+
+@media(max-width:600px){
+    .games{
+        grid-template-columns:1fr;
+        max-width:400px;
+    }
+
+    .card{
+        padding:15px;
+    }
+
+    .card p{
+        min-height:0;
+        margin:6px 0 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HOME ================= -->
+
+<div id="home" class="screen">
+
+    <div class="logo">VOIDFORGE // ARCADE</div>
+
+    <h1>GAME HUB</h1>
+
+    <div class="subtitle">
+        Two games. One challenge. How far can you get?
+    </div>
+
+    <div class="games">
+
+        <div class="card">
+            <div class="emoji">🪙</div>
+            <h2>Coin Rush</h2>
+            <p>
+                Collect coins, dodge bombs and survive
+                increasingly difficult waves.
+            </p>
+            <button class="play" onclick="openCoin()">
+                PLAY COIN RUSH
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="emoji">⚔️</div>
+            <h2>Dungeon Escape</h2>
+            <p>
+                Find the key, survive enemies and escape
+                through five increasingly difficult levels.
+            </p>
+            <button class="play" onclick="openDungeon()">
+                PLAY DUNGEON
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ================= COIN RUSH ================= -->
+
+<div id="coinGame" class="game hidden">
+
+    <div class="hud">
+        <span id="coinScore">🪙 0</span>
+        <span id="coinLives">❤️❤️❤️</span>
+        <span id="coinLevel">LV 1</span>
+    </div>
+
+    <button id="coinBack" onclick="backHome()">
+        ← HUB
+    </button>
+
+    <div id="coinPlayer" class="player">🧑</div>
+
+    <div class="controls">
+        <button class="ctrl" id="coinLeft">◀</button>
+        <button class="ctrl" id="coinRight">▶</button>
+    </div>
+
+</div>
+
+
+<!-- ================= DUNGEON ================= -->
+
+<div id="dungeonGame" class="game hidden">
+
+    <div class="hud">
+        <span id="dLevel">LEVEL 1</span>
+        <span id="dHealth">❤️❤️❤️</span>
+        <span id="dKey">🔑 NO</span>
+    </div>
+
+    <button id="dungeonBack" onclick="backHome()">
+        ← HUB
+    </button>
+
+    <div id="dPlayer" class="player">🧙</div>
+
+    <div class="controls">
+
+        <button class="ctrl" id="dUp">▲</button>
+
+        <button class="ctrl" id="dLeft">◀</button>
+
+        <button class="ctrl" id="dDown">▼</button>
+
+        <button class="ctrl" id="dRight">▶</button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= MESSAGE ================= -->
+
+<div id="message" class="screen hidden">
+
+    <h1 id="msgTitle"></h1>
+
+    <p id="msgText"></p>
+
+    <button id="msgButton"></button>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   GENERAL
+========================================================= */
+
+const home=document.getElementById("home");
+const coinGame=document.getElementById("coinGame");
+const dungeonGame=document.getElementById("dungeonGame");
+const message=document.getElementById("message");
+
+function showMessage(title,text,button,action){
+
+    document.getElementById("msgTitle").textContent=title;
+    document.getElementById("msgText").textContent=text;
+
+    const b=document.getElementById("msgButton");
+
+    b.textContent=button;
+    b.onclick=action;
+
+    message.classList.remove("hidden");
+}
+
+function hideMessage(){
+    message.classList.add("hidden");
+}
+
+function backHome(){
+    coinRunning=false;
+    dungeonRunning=false;
+
+    document.querySelectorAll(".falling").forEach(x=>x.remove());
+    document.querySelectorAll(".wall,.enemy,.dungeonItem").forEach(x=>x.remove());
+
+    coinGame.classList.add("hidden");
+    dungeonGame.classList.add("hidden");
+    message.classList.add("hidden");
+    home.classList.remove("hidden");
+}
+
+
+/* =========================================================
+   COIN RUSH
+========================================================= */
+
+let coinRunning=false;
+let coinX=window.innerWidth/2;
+let coinScore=0;
+let coinLives=3;
+let coinLevel=1;
+let coinSpeed=3;
+let coinSpawnTimer=null;
+
+let coinKeys={
+    left:false,
+    right:false
+};
+
+function openCoin(){
+
+    home.classList.add("hidden");
+    dungeonGame.classList.add("hidden");
+    coinGame.classList.remove("hidden");
+
+    startCoin();
+}
+
+function startCoin(){
+
+    coinRunning=false;
+
+    clearTimeout(coinSpawnTimer);
+
+    document.querySelectorAll(".falling").forEach(x=>x.remove());
+
+    coinRunning=true;
+
+    coinX=window.innerWidth/2;
+    coinScore=0;
+    coinLives=3;
+    coinLevel=1;
+    coinSpeed=3;
+
+    updateCoinHUD();
+
+    const player=document.getElementById("coinPlayer");
+
+    player.style.left=(coinX-22)+"px";
+    player.style.top=(window.innerHeight-145)+"px";
+
+    coinLoop();
+
+    scheduleCoin();
+}
+
+function updateCoinHUD(){
+
+    document.getElementById("coinScore").textContent=
+        "🪙 "+coinScore;
+
+    document.getElementById("coinLives").textContent=
+        "❤️".repeat(Math.max(0,coinLives))+
+        "🖤".repeat(Math.max(0,3-coinLives));
+
+    document.getElementById("coinLevel").textContent=
+        "LV "+coinLevel;
+}
+
+function scheduleCoin(){
+
+    if(!coinRunning)return;
+
+    spawnCoin();
+
+    const delay=Math.max(
+        350,
+        850-(coinLevel*55)
+    );
+
+    coinSpawnTimer=setTimeout(scheduleCoin,delay);
+}
+
+function spawnCoin(){
+
+    if(!coinRunning)return;
+
+    const obj=document.createElement("div");
+
+    obj.className="falling";
+
+    const roll=Math.random();
+
+    if(roll<0.18){
+
+        obj.textContent="💣";
+        obj.dataset.type="bomb";
+
+    }else if(roll<0.25){
+
+        obj.textContent="❤️";
+        obj.dataset.type="heart";
+
+    }else{
+
+        obj.textContent="🪙";
+        obj.dataset.type="coin";
+    }
+
+    obj.style.left=
+        Math.max(5,Math.random()*90)+"%";
+
+    obj.style.top="-45px";
+
+    coinGame.appendChild(obj);
+
+    let y=-45;
+
+    const speed=
+        coinSpeed+
+        Math.random()*2+
+        coinLevel*.35;
+
+    const fall=setInterval(()=>{
+
+        if(!coinRunning){
+
+            clearInterval(fall);
+            obj.remove();
+            return;
+        }
+
+        y+=speed;
+        obj.style.top=y+"px";
+
+        const a=obj.getBoundingClientRect();
+
+        const p=
+            document.getElementById("coinPlayer")
+            .getBoundingClientRect();
+
+        if(
+            a.left<p.right &&
+            a.right>p.left &&
+            a.top<p.bottom &&
+            a.bottom>p.top
+        ){
+
+            clearInterval(fall);
+
+            const type=obj.dataset.type;
+
+            obj.remove();
+
+            if(type==="coin"){
+
+                coinScore++;
+
+                if(coinScore%8===0){
+
+                    coinLevel++;
+
+                    coinSpeed+=.45;
+                }
+
+            }else if(type==="bomb"){
+
+                loseCoinLife();
+
+            }else if(type==="heart"){
+
+                coinLives=Math.min(3,coinLives+1);
+            }
+
+            updateCoinHUD();
+
+            return;
+        }
+
+        if(y>window.innerHeight){
+
+            clearInterval(fall);
+
+            obj.remove();
+
+            /*
+              IMPORTANT:
+              Missing a normal coin costs a life.
+              Bombs that fall off-screen do NOT cost a life.
+            */
+
+            if(obj.dataset.type==="coin"){
+
+                loseCoinLife();
+
+            }
+
+        }
+
+    },20);
+}
+
+function loseCoinLife(){
+
+    if(!coinRunning)return;
+
+    coinLives--;
+
+    updateCoinHUD();
+
+    if(coinLives<=0){
+
+        endCoin();
+
+    }
+}
+
+function endCoin(){
+
+    coinRunning=false;
+
+    clearTimeout(coinSpawnTimer);
+
+    document.querySelectorAll(".falling")
+        .forEach(x=>x.remove());
+
+    showMessage(
+        "GAME OVER 💥",
+        "Final score: "+coinScore+" coins — Level "+coinLevel,
+        "PLAY AGAIN",
+        ()=>{
+            hideMessage();
+            startCoin();
+        }
+    );
+}
+
+function coinLoop(){
+
+    if(!coinRunning)return;
+
+    if(coinKeys.left)
+        coinX-=8;
+
+    if(coinKeys.right)
+        coinX+=8;
+
+    coinX=Math.max(
+        22,
+        Math.min(window.innerWidth-22,coinX)
+    );
+
+    document.getElementById("coinPlayer")
+        .style.left=(coinX-22)+"px";
+
+    requestAnimationFrame(coinLoop);
+}
+
+
+/* COIN TOUCH */
+
+function holdButton(element,key){
+
+    element.addEventListener("touchstart",e=>{
+        e.preventDefault();
+        coinKeys[key]=true;
+    },{passive:false});
+
+    element.addEventListener("touchend",e=>{
+        e.preventDefault();
+        coinKeys[key]=false;
+    },{passive:false});
+
+    element.addEventListener("touchcancel",()=>{
+        coinKeys[key]=false;
+    });
+
+    element.addEventListener("mousedown",()=>{
+        coinKeys[key]=true;
+    });
+
+    element.addEventListener("mouseup",()=>{
+        coinKeys[key]=false;
+    });
+
+    element.addEventListener("mouseleave",()=>{
+        coinKeys[key]=false;
+    });
+}
+
+holdButton(
+    document.getElementById("coinLeft"),
+    "left"
+);
+
+holdButton(
+    document.getElementById("coinRight"),
+    "right"
+);
+
+
+/* =========================================================
+   DUNGEON ESCAPE
+========================================================= */
+
+let dungeonRunning=false;
+
+let dX=8;
+let dY=50;
+
+let dLevelNum=1;
+let dHealth=3;
+let dHasKey=false;
+
+let dKeys={
+    up:false,
+    down:false,
+    left:false,
+    right:false
+};
+
+let dEnemies=[];
+let dEnemyTimer=null;
+
+function openDungeon(){
+
+    home.classList.add("hidden");
+    coinGame.classList.add("hidden");
+    dungeonGame.classList.remove("hidden");
+
+    startDungeon();
+}
+
+function startDungeon(){
+
+    dungeonRunning=false;
+
+    clearInterval(dEnemyTimer);
+
+    dungeonGame
+        .querySelectorAll(".wall,.enemy,.dungeonItem")
+        .forEach(x=>x.remove());
+
+    dLevelNum=1;
+    dHealth=3;
+    dX=8;
+    dY=50;
+
+    createDungeon();
+
+    dungeonRunning=true;
+
+    updateDungeonHUD();
+
+    dungeonLoop();
+}
+
+function updateDungeonHUD(){
+
+    document.getElementById("dLevel").textContent=
+        "LEVEL "+dLevelNum;
+
+    document.getElementById("dHealth").textContent=
+        "❤️".repeat(Math.max(0,dHealth))+
+        "🖤".repeat(Math.max(0,3-dHealth));
+
+    document.getElementById("dKey").textContent=
+        dHasKey?"🔑 YES":"🔑 NO";
+}
+
+function createDungeon(){
+
+    dungeonGame
+        .querySelectorAll(".wall,.enemy,.dungeonItem")
+        .forEach(x=>x.remove());
+
+    dHasKey=false;
+
+    /*
+      Dungeon walls
+    */
+
+    const walls=[
+        [22,15,10,55],
+        [48,0,10,45],
+        [48,62,10,38],
+        [72,20,10,60]
+    ];
+
+    walls.forEach(w=>{
+
+        const wall=document.createElement("div");
+
+        wall.className="wall";
+
+        wall.style.left=w[0]+"%";
+        wall.style.top=w[1]+"%";
+        wall.style.width=w[2]+"%";
+        wall.style.height=w[3]+"%";
+
+        dungeonGame.appendChild(wall);
+    });
+
+    /*
+      Key
+    */
+
+    const key=document.createElement("div");
+
+    key.className="dungeonItem";
+    key.textContent="🔑";
+
+    key.style.left=
+        (30+Math.random()*35)+"%";
+
+    key.style.top=
+        (20+Math.random()*50)+"%";
+
+    dungeonGame.appendChild(key);
+
+    /*
+      Exit
+    */
+
+    const exit=document.createElement("div");
+
+    exit.className="dungeonItem";
+    exit.textContent="🚪";
+
+    exit.id="dExit";
+
+    exit.style.right="22px";
+    exit.style.top="90px";
+
+    dungeonGame.appendChild(exit);
+
+    /*
+      Enemies
+    */
+
+    dEnemies=[];
+
+    const count=Math.min(5,1+dLevelNum);
+
+    for(let i=0;i<count;i++){
+
+        const enemy=document.createElement("div");
+
+        enemy.className="enemy";
+        enemy.textContent=
+            dLevelNum>=4?"👹":"👾";
+
+        enemy.style.left=
+            (28+Math.random()*55)+"%";
+
+        enemy.style.top=
+            (20+Math.random()*55)+"%";
+
+        dungeonGame.appendChild(enemy);
+
+        dEnemies.push({
+            element:enemy,
+            x:parseFloat(enemy.style.left),
+            y:parseFloat(enemy.style.top),
+            dir:Math.random()<.5?1:-1
+        });
+    }
+}
+
+function dungeonLoop(){
+
+    if(!dungeonRunning)return;
+
+    const speed=.65;
+
+    if(dKeys.up)dY-=speed;
+    if(dKeys.down)dY+=speed;
+    if(dKeys.left)dX-=speed;
+    if(dKeys.right)dX+=speed;
+
+    dX=Math.max(3,Math.min(94,dX));
+    dY=Math.max(8,Math.min(80,dY));
+
+    const player=
+        document.getElementById("dPlayer");
+
+    player.style.left=dX+"%";
+    player.style.top=dY+"%";
+
+    moveEnemies();
+    checkDungeonCollision();
+
+    requestAnimationFrame(dungeonLoop);
+}
+
+function moveEnemies(){
+
+    dEnemies.forEach(enemy=>{
+
+        enemy.x+=enemy.dir*(0.15+dLevelNum*.03);
+
+        if(enemy.x>88){
+            enemy.x=88;
+            enemy.dir=-1;
+        }
+
+        if(enemy.x<15){
+            enemy.x=15;
+            enemy.dir=1;
+        }
+
+        enemy.element.style.left=
+            enemy.x+"%";
+    });
+}
+
+function checkDungeonCollision(){
+
+    const player=
+        document.getElementById("dPlayer")
+        .getBoundingClientRect();
+
+    /*
+      Key
+    */
+
+    const key=
+        dungeonGame.querySelector(".dungeonItem:not(#dExit)");
+
+    if(key){
+
+        const r=key.getBoundingClientRect();
+
+        if(overlap(player,r)){
+
+            dHasKey=true;
+
+            key.remove();
+
+            updateDungeonHUD();
+        }
+    }
+
+    /*
+      Exit
+    */
+
+    const exit=document.getElementById("dExit");
+
+    if(exit){
+
+        const r=exit.getBoundingClientRect();
+
+        if(overlap(player,r) && dHasKey){
+
+            nextDungeonLevel();
+            return;
+        }
+    }
+
+    /*
+      Enemies
+    */
+
+    dEnemies.forEach(enemy=>{
+
+        if(!enemy.element.parentElement)return;
+
+        const r=enemy.element.getBoundingClientRect();
+
+        if(overlap(player,r)){
+
+            damageDungeonPlayer();
+        }
+    });
+}
+
+function overlap(a,b){
+
+    return(
+        a.left<b.right &&
+        a.right>b.left &&
+        a.top<b.bottom &&
+        a.bottom>b.top
+    );
+}
+
+let lastDamage=0;
+
+function damageDungeonPlayer(){
+
+    const now=Date.now();
+
+    if(now-lastDamage<1000)return;
+
+    lastDamage=now;
+
+    dHealth--;
+
+    updateDungeonHUD();
+
+    if(dHealth<=0){
+
+        dungeonRunning=false;
+
+        showMessage(
+            "YOU GOT CAUGHT 👾",
+            "You reached level "+dLevelNum+".",
+            "TRY AGAIN",
+            ()=>{
+                hideMessage();
+                startDungeon();
+            }
+        );
+    }
+}
+
+function nextDungeonLevel(){
+
+    dLevelNum++;
+
+    if(dLevelNum>5){
+
+        dungeonRunning=false;
+
+        showMessage(
+            "DUNGEON ESCAPED! 🏆",
+            "You defeated all 5 levels!",
+            "PLAY AGAIN",
+            ()=>{
+                hideMessage();
+                startDungeon();
+            }
+        );
+
+        return;
+    }
+
+    dX=8;
+    dY=50;
+
+    createDungeon();
+
+    updateDungeonHUD();
+}
+
+
+/* DUNGEON TOUCH */
+
+function dHold(element,key){
+
+    element.addEventListener("touchstart",e=>{
+        e.preventDefault();
+        dKeys[key]=true;
+    },{passive:false});
+
+    element.addEventListener("touchend",e=>{
+        e.preventDefault();
+        dKeys[key]=false;
+    },{passive:false});
+
+    element.addEventListener("touchcancel",()=>{
+        dKeys[key]=false;
+    });
+
+    element.addEventListener("mousedown",()=>{
+        dKeys[key]=true;
+    });
+
+    element.addEventListener("mouseup",()=>{
+        dKeys[key]=false;
+    });
+
+    element.addEventListener("mouseleave",()=>{
+        dKeys[key]=false;
+    });
+}
+
+dHold(document.getElementById("dUp"),"up");
+dHold(document.getElementById("dDown"),"down");
+dHold(document.getElementById("dLeft"),"left");
+dHold(document.getElementById("dRight"),"right");
+
+
+/* KEYBOARD */
+
+document.addEventListener("keydown",e=>{
+
+    if(e.key==="ArrowLeft"){
+
+        coinKeys.left=true;
+        dKeys.left=true;
+    }
+
+    if(e.key==="ArrowRight"){
+
+        coinKeys.right=true;
+        dKeys.right=true;
+    }
+
+    if(e.key==="ArrowUp")
+        dKeys.up=true;
+
+    if(e.key==="ArrowDown")
+        dKeys.down=true;
+});
+
+document.addEventListener("keyup",e=>{
+
+    if(e.key==="ArrowLeft"){
+
+        coinKeys.left=false;
+        dKeys.left=false;
+    }
+
+    if(e.key==="ArrowRight"){
+
+        coinKeys.right=false;
+        dKeys.right=false;
+    }
+
+    if(e.key==="ArrowUp")
+        dKeys.up=false;
+
+    if(e.key==="ArrowDown")
+        dKeys.down=false;
+});
+
+</script>
+
+</body>
+</html>
